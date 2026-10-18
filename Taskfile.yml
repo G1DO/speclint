@@ -20,17 +20,17 @@ tasks:
   test:e2e:
     desc: End-to-end CLI probes on fixtures (fail-closed)
     cmds:
-      - sh -c 'set -euo pipefail; python3 -m src.speclint fixtures/good.md; test $? -eq 0; ! python3 -m src.speclint fixtures/bad-dup.md; ! python3 -m src.speclint fixtures/bad-baseline.md'
+      - bash -c 'set -euo pipefail; python3 -m src.speclint fixtures/good.md; test $? -eq 0; ! python3 -m src.speclint fixtures/bad-dup.md; ! python3 -m src.speclint fixtures/bad-baseline.md'
 
   test:contract:
     desc: Contract compatibility (oasdiff ERR fail, resolvable baseline, stale-baseline fail)
     cmds:
-      - sh -c 'set -euo pipefail; found=""; for f in openapi/*.yaml openapi/*.yml openapi/*.json docs/contracts/*.yaml docs/contracts/*.yml docs/contracts/*.json; do [ -e "$f" ] && found="$found $f"; done; if [ -z "$found" ]; then echo "contract N/A absent"; exit 0; fi; set -- $found; if [ $# -ge 2 ]; then BASE=$1; REV=$2; else REV=$1; git show HEAD:"$REV" >/tmp/contract-base.yaml; BASE=/tmp/contract-base.yaml; fi; if [ ! -f .oasdiff.err-ignore ]; then echo "contract FAIL baseline missing"; exit 1; fi; oasdiff breaking --fail-on ERR --err-ignore .oasdiff.err-ignore "$BASE" "$REV"; ACTIVE=$(awk "!/^#/ && !/^$/ {n++} END {print n+0}" .oasdiff.err-ignore); if [ "$ACTIVE" -gt 0 ]; then if oasdiff breaking -f singleline "$BASE" "$REV" | grep -q -E "^(error|warning)"; then echo "contract ok baseline applied"; else echo "contract FAIL baseline stale"; exit 1; fi; else echo "contract ok no breaking"; fi'
+      - bash -c 'set -euo pipefail; found=""; for f in openapi/*.yaml openapi/*.yml openapi/*.json docs/contracts/*.yaml docs/contracts/*.yml docs/contracts/*.json; do [ -e "$f" ] && found="$found $f"; done; if [ -z "$found" ]; then echo "contract N/A absent"; exit 0; fi; set -- $found; if [ $# -ge 2 ]; then BASE=$1; REV=$2; else REV=$1; git show HEAD:"$REV" >/tmp/contract-base.yaml; BASE=/tmp/contract-base.yaml; fi; if [ ! -f .oasdiff.err-ignore ]; then echo "contract FAIL baseline missing"; exit 1; fi; oasdiff breaking --fail-on ERR --err-ignore .oasdiff.err-ignore "$BASE" "$REV"; ACTIVE=$(awk "!/^#/ && !/^$/ {n++} END {print n+0}" .oasdiff.err-ignore); if [ "$ACTIVE" -gt 0 ]; then if oasdiff breaking -f singleline "$BASE" "$REV" | grep -q -E "^(error|warning)"; then echo "contract ok baseline applied"; else echo "contract FAIL baseline stale"; exit 1; fi; else echo "contract ok no breaking"; fi'
 
   migrate:
     desc: Migration gate (absent means omitted, present without runner fails)
     cmds:
-      - sh -c 'set -euo pipefail; if ls migrations/*.sql >/dev/null 2>&1; then echo "migrate FAIL present no runner"; exit 1; else echo "migrate N/A absent"; exit 0; fi'
+      - bash -c 'set -euo pipefail; if ls migrations/*.sql >/dev/null 2>&1; then echo "migrate FAIL present no runner"; exit 1; else echo "migrate N/A absent"; exit 0; fi'
 
   build:
     desc: Build the repeatable delivery artifact
@@ -52,19 +52,19 @@ tasks:
     desc: Dependency audit (osv-scanner fail-closed; pip-audit where a manifest exists)
     cmds:
       - osv-scanner scan source --allow-no-lockfiles -r .
-      - sh -c 'set -euo pipefail; found=""; for m in requirements*.txt pyproject.toml; do [ -e "$m" ] && found="$found $m"; done; if [ -n "$found" ]; then pip-audit; else echo "audit N/A no manifest"; fi'
+      - bash -c 'set -euo pipefail; found=""; for m in requirements*.txt pyproject.toml; do [ -e "$m" ] && found="$found $m"; done; if [ -n "$found" ]; then pip-audit; else echo "audit N/A no manifest"; fi'
 
   check:hygiene:
     desc: Placeholders, path alignment, no echo stubs
     cmds:
-      - sh -c 'set -euo pipefail; ! grep -R -n -E "TODO[ ]CI|echo[ ]placeholder|\\|\\|[ ]true|assertTrue\\(True\\)|python3? -c .print\\(|@O[R]G/" --exclude-dir=.git --exclude-dir=__pycache__ .'
-      - sh -c 'set -euo pipefail; grep -q "/src/auth/" .github/CODEOWNERS; grep -q "/src/data/" .github/CODEOWNERS; grep -q "migrations/" .github/CODEOWNERS; grep -q "openapi" .github/CODEOWNERS; grep -q "/.github/" .github/CODEOWNERS; grep -q "^\\* " .github/CODEOWNERS; ! grep -q "@O[R]G/" .github/CODEOWNERS'
+      - bash -c 'set -euo pipefail; ! grep -R -n -E "TODO[ ]CI|echo[ ]placeholder|\\|\\|[ ]true|assertTrue\\(True\\)|python3? -c .print\\(|@O[R]G/" --exclude-dir=.git --exclude-dir=__pycache__ .'
+      - bash -c 'set -euo pipefail; grep -q "/src/auth/" .github/CODEOWNERS; grep -q "/src/data/" .github/CODEOWNERS; grep -q "migrations/" .github/CODEOWNERS; grep -q "openapi" .github/CODEOWNERS; grep -q "/.github/" .github/CODEOWNERS; grep -q "^\\* " .github/CODEOWNERS; ! grep -q "@O[R]G/" .github/CODEOWNERS'
 
   diagrams:
     desc: Validate workspace.dsl via structurizr validate
     cmds:
       - structurizr.sh validate -workspace docs/architecture/workspace.dsl
-      - sh -c 'set -euo pipefail; ! grep -R -n --include="*.md" -E "mermaid|plantuml" docs'
+      - bash -c 'set -euo pipefail; ! grep -R -n --include="*.md" -E "mermaid|plantuml" docs'
 
   verify:
     desc: Full local gate (absent suites omitted, never skipped; migrate excluded — it writes)
