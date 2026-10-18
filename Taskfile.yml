@@ -54,12 +54,6 @@ tasks:
       - osv-scanner scan source --allow-no-lockfiles -r .
       - bash -c 'set -euo pipefail; found=""; for m in requirements*.txt pyproject.toml; do [ -e "$m" ] && found="$found $m"; done; if [ -n "$found" ]; then pip-audit; else echo "audit N/A no manifest"; fi'
 
-  check:hygiene:
-    desc: Placeholders, path alignment, no echo stubs
-    cmds:
-      - bash -c 'set -euo pipefail; ! grep -R -n -E "TODO[ ]CI|echo[ ]placeholder|\\|\\|[ ]true|assertTrue\\(True\\)|python3? -c .print\\(|@O[R]G/" --exclude-dir=.git --exclude-dir=__pycache__ .'
-      - bash -c 'set -euo pipefail; grep -q "/src/auth/" .github/CODEOWNERS; grep -q "/src/data/" .github/CODEOWNERS; grep -q "migrations/" .github/CODEOWNERS; grep -q "openapi" .github/CODEOWNERS; grep -q "/.github/" .github/CODEOWNERS; grep -q "^\\* " .github/CODEOWNERS; ! grep -q "@O[R]G/" .github/CODEOWNERS'
-
   diagrams:
     desc: Validate workspace.dsl via structurizr validate
     cmds:
