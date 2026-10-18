@@ -1,0 +1,4 @@
+services:
+  api:
+    build: .
+    command: ["python3", "-m", "src.speclint", "--help"]

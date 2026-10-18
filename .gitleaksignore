@@ -1,0 +1,4 @@
+# Baseline for gitleaks working-tree scans (gitleaks dir).
+# Each line is a fingerprint of a reviewed non-issue. Resolve, do not extend.
+# Fingerprint format: <path>:<rule>:<line>
+# No baselines in v0.1.0 (stdlib only, no fixtures with secrets).
