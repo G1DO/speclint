@@ -19,3 +19,5 @@ workspace "speclint" "Minimal C1/C2 for speclint — sole source for container v
         }
     }
 }
+
+{{{ UNBALANCED BRACE FOR C6 TEST (delete after)
