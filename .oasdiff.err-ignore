@@ -4,3 +4,4 @@
 # Empty (comments only) means no exceptions: every ERR fails the gate.
 # Must-resolve: contract check fails if these entries match nothing,
 # so stale ignores cannot linger. Resolve, do not extend.
+GET /other stale-ignore-for-test
