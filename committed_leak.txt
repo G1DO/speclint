@@ -1,0 +1,2 @@
+# obviously fake non-functional C6 test token, delete after
+token = "ghp_FAKE12345678901234567890123456789012"
